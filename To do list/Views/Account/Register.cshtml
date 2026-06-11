@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Register"; Layout = "_Layout";
+}
+
+<div class="auth-card">
+    <div class="auth-logo">✦ TaskFlow</div>
+    <h2>Create account</h2>
+    <p class="auth-sub">Get started for free</p>
+
+    <form method="post" action="/Account/Register">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <label>Full name</label>
+            <input type="text" name="fullName" class="form-control" placeholder="Angee Shrestha" required />
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" placeholder="you@email.com" required />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Min. 6 characters" required />
+        </div>
+        <button type="submit" class="btn-primary full">Create account</button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="/Account/Login">Sign in</a></p>
+</div>

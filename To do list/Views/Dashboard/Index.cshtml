@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <a href="/Todo/Create" class="btn-primary">+ New task</a>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-value">@ViewBag.Total</div>
+        <div class="stat-label">Total tasks</div>
+    </div>
+    <div class="stat-card accent-green">
+        <div class="stat-value">@ViewBag.Completed</div>
+        <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card accent-blue">
+        <div class="stat-value">@ViewBag.Active</div>
+        <div class="stat-label">Active</div>
+    </div>
+    <div class="stat-card accent-red">
+        <div class="stat-value">@ViewBag.Overdue</div>
+        <div class="stat-label">Overdue</div>
+    </div>
+    <div class="stat-card accent-orange">
+        <div class="stat-value">@ViewBag.DueToday</div>
+        <div class="stat-label">Due today</div>
+    </div>
+    <div class="stat-card accent-purple">
+        <div class="stat-value">@ViewBag.HighPrio</div>
+        <div class="stat-label">High priority</div>
+    </div>
+</div>
+
+<div class="dash-row">
+    <div class="dash-panel">
+        <h3>By category</h3>
+        @foreach (var cat in (dynamic)ViewBag.ByCategory)
+        {
+            var pct = cat.Count > 0 ? (int)((cat.Done / (double)cat.Count) * 100) : 0;
+            <div class="cat-row">
+                <span class="cat-name">@cat.Category</span>
+                <div class="progress-bar"><div class="progress-fill" style="width:@pct%"></div></div>
+                <span class="cat-count">@cat.Done / @cat.Count</span>
+            </div>
+        }
+    </div>
+
+    <div class="dash-panel">
+        <h3>Recent tasks</h3>
+        <ul class="recent-list">
+            @foreach (TodoApp.Models.TodoItem task in ViewBag.RecentTasks)
+            {
+                <li class="recent-item @(task.IsCompleted ? "done" : "")">
+                    <span class="recent-dot priority-dot-@task.Priority.ToString().ToLower()"></span>
+                    <span class="recent-title">@task.Title</span>
+                    <span class="recent-date">@task.CreatedAt.ToString("dd MMM")</span>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

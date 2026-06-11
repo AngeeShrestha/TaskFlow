@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — TaskFlow</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-icon">✦</span>
+                <span class="logo-text">TaskFlow</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="/Dashboard" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                        <span class="nav-icon">⊞</span> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/Todo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Todo" ? "active" : "")">
+                        <span class="nav-icon">☑</span> My Tasks
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <span class="user-name">@User.Identity.Name</span>
+                <form method="post" action="/Account/Logout">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn">Sign out</button>
+                </form>
+            </div>
+        </nav>
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    }
+    else
+    {
+        <main class="auth-main">@RenderBody()</main>
+    }
+    <script src="~/js/todo.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,85 @@
+﻿@model List<TodoApp.Models.TodoItem>
+@{
+    ViewData["Title"] = "My Tasks";
+}
+
+<div class="page-header">
+    <h1>My tasks</h1>
+    <a href="/Todo/Create" class="btn-primary">+ New task</a>
+</div>
+
+<div class="toolbar">
+    <div class="search-wrap">
+        <form method="get">
+            <input type="text" name="search" value="@ViewBag.Search" class="search-input" placeholder="Search tasks…" />
+            <input type="hidden" name="filter" value="@ViewBag.Filter" />
+            <input type="hidden" name="category" value="@ViewBag.Category" />
+        </form>
+    </div>
+    <div class="filters">
+        @foreach (var f in new[] { ("all", "All"), ("active", "Active"), ("done", "Done"), ("today", "Today"), ("overdue", "Overdue") })
+        {
+            <a href="?filter=@f.Item1&search=@ViewBag.Search" class="filter-btn @(ViewBag.Filter == f.Item1 ? "active" : "")">@f.Item2</a>
+        }
+    </div>
+    <div class="filters">
+        @foreach (var cat in Enum.GetNames(typeof(TodoApp.Models.Category)))
+        {
+            <a href="?category=@cat&filter=@ViewBag.Filter&search=@ViewBag.Search" class="filter-btn cat-btn @(ViewBag.Category == cat ? "active" : "")">@cat</a>
+        }
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <div class="empty-icon">✓</div>
+        <p>No tasks here.</p>
+        <a href="/Todo/Create" class="btn-primary">Add your first task</a>
+    </div>
+}
+
+<ul class="task-list" id="task-list">
+    @foreach (var item in Model)
+    {
+        var overdue = !item.IsCompleted && item.DueDate.HasValue && item.DueDate < DateTime.Today;
+        <li class="task-card @(item.IsCompleted ? "done" : "") @(overdue ? "overdue" : "")" data-id="@item.Id" draggable="true">
+            <span class="drag-handle">⠿</span>
+
+            <form method="post" action="/Todo/ToggleComplete/@item.Id">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="check-btn @(item.IsCompleted ? "checked" : "")"></button>
+            </form>
+
+            <div class="task-body">
+                <div class="task-title">@item.Title</div>
+                @if (!string.IsNullOrEmpty(item.Description))
+                {
+                    <div class="task-desc">@item.Description</div>
+                }
+                <div class="task-meta">
+                    <span class="badge priority-@item.Priority.ToString().ToLower()">@item.Priority</span>
+                    <span class="badge cat-badge">@item.Category</span>
+                    @if (item.DueDate.HasValue)
+                    {
+                        <span class="due @(overdue ? "due-overdue" : "")">
+                            @(overdue ? "⚠ " : "")@item.DueDate.Value.ToString("dd MMM yyyy")
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="task-actions">
+                <a href="/Todo/Edit/@item.Id" class="btn-icon" title="Edit">✏</a>
+                <form method="post" action="/Todo/Delete/@item.Id" onsubmit="return confirm('Delete this task?')">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-icon danger" title="Delete">✕</button>
+                </form>
+            </div>
+        </li>
+    }
+</ul>
+
+@section Scripts {
+    <script>initDragAndDrop();</script>
+}
